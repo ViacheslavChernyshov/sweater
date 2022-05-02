@@ -5,14 +5,7 @@ create table hibernate_sequence
     next_val bigint
 ) engine = InnoDB;
 
-# CREATE TABLE hibernate_sequence (
-#     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL
-# );
-# create sequence hibernate_sequence start 2 increment 1;
-# create sequence hibernate_sequence start 2 increment 1;
-# create sequence hibernate_sequence start 2 increment 1;
-insert into hibernate_sequence
-values (5);
+insert into hibernate_sequence values (2);
 
 create table message
 (
@@ -45,11 +38,5 @@ alter table message
     add constraint message_user_fk
         foreign key (user_id) references usr (id);
 
-# alter table user_role
-#     add constraint user_role_user_fk
-#         foreign key (user_id) references usr (id);
-
 alter table user_role
     add constraint user_role_user_fk foreign key (user_id) references usr (id)
-
-

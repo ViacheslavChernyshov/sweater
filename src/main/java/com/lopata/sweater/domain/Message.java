@@ -1,13 +1,20 @@
 package com.lopata.sweater.domain;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
+    @NotBlank(message = "Please fill the message")
+    @Length(max = 2048, message = "Message too long(more than 2kB")
     private String text;
+    @Length(max = 255, message = "Message too long(more than 255)")
     private String tag;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -21,11 +28,7 @@ public class Message {
 
     public Message(String text, String tag, User user) {
         this.author = user;
-
-
         this.text = text;
-
-
         this.tag = tag;
     }
 
@@ -57,6 +60,10 @@ public class Message {
         this.id = id;
     }
 
+    public String getTag() {
+        return tag;
+    }
+
     public void setTag(String tag) {
         this.tag = tag;
     }
@@ -67,9 +74,5 @@ public class Message {
 
     public void setFilename(String filename) {
         this.filename = filename;
-    }
-
-    public String getTag() {
-        return tag;
     }
 }

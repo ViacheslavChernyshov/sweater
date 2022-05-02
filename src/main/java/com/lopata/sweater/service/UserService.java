@@ -1,5 +1,6 @@
 package com.lopata.sweater.service;
 
+import antlr.StringUtils;
 import com.lopata.sweater.domain.Role;
 import com.lopata.sweater.domain.User;
 import com.lopata.sweater.repos.UserRepo;
@@ -8,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,9 +26,16 @@ public class UserService implements UserDetailsService {
     @Value("${activateLink}")
     private String activateLink;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return user;
     }
 
     public boolean addUser(User user){
@@ -39,6 +47,7 @@ public class UserService implements UserDetailsService {
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
         user.setActivationCode(UUID.randomUUID().toString());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userRepo.save(user);
 
@@ -47,7 +56,7 @@ public class UserService implements UserDetailsService {
     }
 
     private void sendMessage(User user) {
-        if (!StringUtils.isEmpty(user.getEmail())) {
+        //if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
                             "Welcome to Sweater. Please, visit next link:" + activateLink + "",
@@ -55,7 +64,7 @@ public class UserService implements UserDetailsService {
                     user.getActivationCode()
             );
             mailSender.send(user.getEmail(), "Activation code", message);
-        }
+        //}
     }
 
     public boolean activateUser(String code) {
@@ -94,16 +103,26 @@ public class UserService implements UserDetailsService {
         if (isMailChanged) {
             user.setEmail(email);
 
-            if (StringUtils.isEmpty(email)) {
+            //if (StringUtils.isEmpty(email)) {
                 user.setActivationCode((UUID.randomUUID().toString()));
-            }
+            //}
         }
-        if (StringUtils.isEmpty(password)) {
+        //if (StringUtils.isEmpty(password)) {
             user.setPassword(password);
-        }
+        //}
         userRepo.save(user);
         if (isMailChanged) {
             sendMessage(user);
         }
+    }
+
+    public void subscribe(User currentUser, User user) {
+        user.getSubscribers().add(currentUser);
+        userRepo.save(user);
+    }
+
+    public void unsubscribe(User currentUser, User user) {
+        user.getSubscribers().remove(currentUser);
+        userRepo.save(user);
     }
 }
