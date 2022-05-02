@@ -9,6 +9,7 @@ public class Message {
     private Long id;
 
     private String text;
+
     private String tag;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -23,6 +24,8 @@ public class Message {
     public Message(String text, String tag, User user) {
         this.author = user;
         this.text = text;
+
+
         this.tag = tag;
     }
 
