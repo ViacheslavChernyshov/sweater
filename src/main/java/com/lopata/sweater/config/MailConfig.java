@@ -11,6 +11,12 @@ import java.util.Properties;
 
 @Configuration
 public class MailConfig {
+
+
+
+
+
+
     @Value("${spring.mail.host}")
     public String host;
     @Value("${spring.mail.port}")
