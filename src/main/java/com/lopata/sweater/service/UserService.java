@@ -1,6 +1,5 @@
 package com.lopata.sweater.service;
 
-import antlr.StringUtils;
 import com.lopata.sweater.domain.Role;
 import com.lopata.sweater.domain.User;
 import com.lopata.sweater.repos.UserRepo;
@@ -10,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,7 +47,7 @@ public class UserService implements UserDetailsService {
     }
 
     private void sendMessage(User user) {
-        //if (!StringUtils.isEmpty(user.getEmail())) {
+        if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
                             "Welcome to Sweater. Please, visit next link:" + activateLink + "",
@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
                     user.getActivationCode()
             );
             mailSender.send(user.getEmail(), "Activation code", message);
-        //}
+        }
     }
 
     public boolean activateUser(String code) {
@@ -94,13 +94,13 @@ public class UserService implements UserDetailsService {
         if (isMailChanged) {
             user.setEmail(email);
 
-            //if (StringUtils.isEmpty(email)) {
+            if (StringUtils.isEmpty(email)) {
                 user.setActivationCode((UUID.randomUUID().toString()));
-            //}
+            }
         }
-        //if (StringUtils.isEmpty(password)) {
+        if (StringUtils.isEmpty(password)) {
             user.setPassword(password);
-        //}
+        }
         userRepo.save(user);
         if (isMailChanged) {
             sendMessage(user);
