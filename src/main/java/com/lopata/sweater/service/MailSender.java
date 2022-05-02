@@ -23,6 +23,6 @@ public class MailSender {
         mailMessage.setText(message);
         mailSender.send(mailMessage);
 
-        System.out.println("Mail Sent succesfully...!");
+        System.out.println("Mail Sent succesfully!!!");
     }
 }

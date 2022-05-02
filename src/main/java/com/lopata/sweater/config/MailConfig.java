@@ -1,6 +1,5 @@
 package com.lopata.sweater.config;
 
-import javafx.beans.property.Property;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +10,6 @@ import java.util.Properties;
 
 @Configuration
 public class MailConfig {
-
-
-
-
 
 
     @Value("${spring.mail.host}")

@@ -1,36 +1,38 @@
 package com.lopata.sweater.service;
 
-import antlr.StringUtils;
 import com.lopata.sweater.domain.Role;
 import com.lopata.sweater.domain.User;
 import com.lopata.sweater.repos.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
 
-    @Autowired
-    private MailSender mailSender;
+    private final MailSender mailSender;
 
     @Value("${activateLink}")
     private String activateLink;
+
+    public UserService(MailSender mailSender, UserRepo userRepo) {
+        this.mailSender = mailSender;
+        this.userRepo = userRepo;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepo.findByUsername(username);
     }
 
-    public boolean addUser(User user){
+    public boolean addUser(User user) {
         User userFromDb = userRepo.findByUsername(user.getUsername());
 
         if (userFromDb != null) {
@@ -47,21 +49,19 @@ public class UserService implements UserDetailsService {
     }
 
     private void sendMessage(User user) {
-        //if (!StringUtils.isEmpty(user.getEmail())) {
-            String message = String.format(
-                    "Hello, %s! \n" +
-                            "Welcome to Sweater. Please, visit next link:" + activateLink + "",
-                    user.getUsername(),
-                    user.getActivationCode()
-            );
-            mailSender.send(user.getEmail(), "Activation code", message);
-        //}
+        String message = String.format(
+                "Hello, %s! \n" +
+                        "Welcome to Sweater. Please, visit next link:" + activateLink + "",
+                user.getUsername(),
+                user.getActivationCode()
+        );
+        mailSender.send(user.getEmail(), "Activation code", message);
     }
 
     public boolean activateUser(String code) {
         User user = userRepo.findByActivationCode(code);
         if (user == null) {
-          return false;
+            return false;
         }
         user.setActivationCode(null);
         userRepo.save(user);
@@ -78,6 +78,8 @@ public class UserService implements UserDetailsService {
                 .map(Role::name)
                 .collect(Collectors.toSet());
         user.getRoles().clear();
+
+
         for (String key : form.keySet()) {
             if (roles.contains(key)) {
                 user.getRoles().add(Role.valueOf(key));
@@ -94,13 +96,13 @@ public class UserService implements UserDetailsService {
         if (isMailChanged) {
             user.setEmail(email);
 
-            //if (StringUtils.isEmpty(email)) {
+            if (StringUtils.isEmpty(email)) {
                 user.setActivationCode((UUID.randomUUID().toString()));
-            //}
+            }
         }
-        //if (StringUtils.isEmpty(password)) {
+        if (StringUtils.isEmpty(password)) {
             user.setPassword(password);
-        //}
+        }
         userRepo.save(user);
         if (isMailChanged) {
             sendMessage(user);

@@ -23,7 +23,7 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String addUser(User user, Map<String, Object> model) {
         if (!userService.addUser(user)) {
-            model.put("message", "User exists!");
+            model.put("message", "User exists !");
             return "registration";
         }
         return "redirect:login";
@@ -36,7 +36,7 @@ public class RegistrationController {
         if (isActivated) {
             model.addAttribute("message", "User successfully activated");
         } else {
-            model.addAttribute("message", "Activate code not found!");
+            model.addAttribute("message", "Activate code not found and mzfc!");
         }
         return "login";
     }
