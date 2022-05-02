@@ -26,6 +26,12 @@ public class MailConfig {
     public JavaMailSender getMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
+
+        //Дима лох
+
+
+
+
         mailSender.setHost(host);
         mailSender.setPort(port);
         mailSender.setUsername(username);
